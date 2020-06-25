@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+  "name": "Send to Todoist",
+  "description": "Quickly create tasks in Todoist",
+  "version": "1.0",
+  "applications": {
+    "gecko": {
+      "id": "send-to-todoist@hipsterbrown.com"
+    }
+  },
+  "browser_action": {
+    "browser_style": true,
+    "default_title": "Send to Todoist",
+    "default_popup": "build/popup/index.html"
+  },
+  "background": {
+    "scripts": ["build/background/index.js"]
+  },
+  "permissions": ["activeTab", "menus", "notifications", "storage"]
+}
