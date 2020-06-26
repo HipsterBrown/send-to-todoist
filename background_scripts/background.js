@@ -3,13 +3,13 @@ const browser = require("webextension-polyfill");
 async function main() {
   const projects = await getProjects();
 
-  for (const { id, name } of projects) {
+  projects.forEach(({ id, name }, index) => {
     browser.menus.create({
       contexts: ["selection", "link"],
       id: String(id),
-      title: name
+      title: `&${index + 1} ${name}`
     });
-  }
+  });
 }
 
 main();
@@ -24,7 +24,7 @@ browser.menus.onClicked.addListener(async event => {
 
   if (content) {
     const projects = await getProjects();
-    const { id: projectId } =
+    const { id: projectId, name: projectName } =
       projects.find(({ id }) => id === parseInt(event.menuItemId)) || {};
 
     const response = await fetch("https://api.todoist.com/rest/v1/tasks", {
@@ -42,7 +42,7 @@ browser.menus.onClicked.addListener(async event => {
     if (data.url) {
       await browser.notifications.create("newTask", {
         type: "basic",
-        title: "New task created!",
+        title: `New ${projectName || "Inbox"} task created!`,
         message: data.url
       });
     }
