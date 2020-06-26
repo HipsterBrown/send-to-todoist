@@ -1,13 +1,29 @@
 const browser = require("webextension-polyfill");
 
+const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
+
 async function main() {
   const projects = await getProjects();
 
   projects.forEach(({ id, name }, index) => {
-    browser.menus.create({
+    const parentId = browser.menus.create({
       contexts: ["selection", "link"],
       id: String(id),
       title: `&${index + 1} ${name}`
+    });
+    DUE_STRINGS.forEach((dueString, dueIndex) => {
+      browser.menus.create({
+        contexts: ["selection", "link"],
+        id: `${index}-due-${dueString}`,
+        title: `&${dueIndex + 1} ${dueString}`,
+        parentId
+      });
+    });
+    browser.menus.create({
+      contexts: ["selection", "link"],
+      id: `${index}-due`,
+      title: `&${DUE_STRINGS.length + 1} No due date`,
+      parentId
     });
   });
 }
@@ -24,14 +40,16 @@ browser.menus.onClicked.addListener(async event => {
 
   if (content) {
     const projects = await getProjects();
+    const dueString = event.menuItemId.split("-").pop();
     const { id: projectId, name: projectName } =
-      projects.find(({ id }) => id === parseInt(event.menuItemId)) || {};
+      projects.find(({ id }) => id === parseInt(event.parentMenuItemId)) || {};
 
     const response = await fetch("https://api.todoist.com/rest/v1/tasks", {
       method: "post",
       body: JSON.stringify({
         content,
-        project_id: projectId
+        project_id: projectId,
+        due_string: DUE_STRINGS.includes(dueString) ? dueString : undefined
       }),
       headers: {
         "Content-Type": "application/json",
