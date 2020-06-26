@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="50px" height="50px" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
+    <title>SendToTodoist v2</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="24" cy="24" r="21"></circle>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="SendToTodoist-v2" transform="translate(1.000000, 1.000000)">
+            <circle id="Oval" stroke="#4F4F4F" fill="#FFFFFF" cx="24" cy="24" r="24"></circle>
+            <g id="Oval">
+                <use fill="#F72E21" fill-rule="evenodd" style="mix-blend-mode: darken;" xlink:href="#path-1"></use>
+                <use stroke="#4F4F4F" stroke-width="1" xlink:href="#path-1"></use>
+            </g>
+            <g id="Airplane" transform="translate(23.501184, 21.915397) rotate(-345.000000) translate(-23.501184, -21.915397) translate(8.001184, 4.415397)" fill="#FFFFFF" stroke="#4F4F4F">
+                <polygon id="Triangle" transform="translate(13.983655, 15.333166) rotate(40.000000) translate(-13.983655, -15.333166) " points="15.2155543 0.686993921 19.2173557 24.6009386 8.74995466 29.979339"></polygon>
+                <polygon id="Triangle-Copy" transform="translate(20.771781, 19.084384) rotate(18.000000) translate(-20.771781, -19.084384) " points="20.5456272 4.59629245 26.6331364 33.5724758 14.9104266 28.4449224"></polygon>
+                <polygon id="Triangle" points="12.0356933 26.8514683 16.0949445 30.7927056 12.0356933 34.1238257"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

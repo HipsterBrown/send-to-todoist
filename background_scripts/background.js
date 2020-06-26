@@ -5,11 +5,14 @@ const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
 async function main() {
   const projects = await getProjects();
 
-  projects.forEach(({ id, name }, index) => {
+  projects.forEach(({ id, name, color }, index) => {
     const parentId = browser.menus.create({
       contexts: ["selection", "link"],
       id: String(id),
-      title: `&${index + 1} ${name}`
+      title: `&${index + 1} ${name}`,
+      icons: {
+        "16": `icons/project-color-${color}.svg`
+      }
     });
     DUE_STRINGS.forEach((dueString, dueIndex) => {
       browser.menus.create({
