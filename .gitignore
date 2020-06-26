@@ -1,8 +1,8 @@
 node_modules/
 .DS_Store
+build/**/*.map
 build/popup/index.js
 build/background/index.js
-build/**/*.map
 .env
 .web-extension-id
 web-ext-artifacts/

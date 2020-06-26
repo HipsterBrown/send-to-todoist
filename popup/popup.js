@@ -14,5 +14,5 @@ apiKeyInput.addEventListener("input", async ({ target }) => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const { apiKey } = await browser.storage.local.get("apiKey");
-  apiKeyInput.setAttribute("value", apiKey);
+  apiKeyInput.setAttribute("value", apiKey || "");
 });
