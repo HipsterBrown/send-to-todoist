@@ -2,7 +2,7 @@ const browser = require("webextension-polyfill");
 
 const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
 
-async function main() {
+async function setProjectMenus() {
   const projects = await getProjects();
 
   projects.forEach(({ id, name, color }, index) => {
@@ -31,9 +31,41 @@ async function main() {
   });
 }
 
-main();
+function setOnboardingMenuAction() {
+  browser.menus.create({
+    contexts: ["all"],
+    id: "set-todoist-key",
+    title: "Send to Todoist: Enter Personal API token"
+  });
+}
+
+browser.runtime.onInstalled.addListener(async ({ reason }) => {
+  if (["install", "update"].includes(reason)) {
+    const key = await getApiKey();
+    if (key) {
+      setProjectMenus();
+    } else {
+      setOnboardingMenuAction();
+    }
+  }
+});
+
+browser.runtime.onMessage.addListener(async ({ status }) => {
+  if (status === "API_KEY_SET") {
+    await browser.menus.remove("set-todoist-key");
+    setProjectMenus();
+  }
+  if (status === "API_KEY_REQUIRED") {
+    await browser.menus.removeAll();
+    setOnboardingMenuAction();
+  }
+});
 
 browser.menus.onClicked.addListener(async event => {
+  if (event.menuItemId === "set-todoist-key") {
+    return browser.browserAction.openPopup();
+  }
+
   const key = await getApiKey();
   let content = event.selectionText || event.linkText;
 
