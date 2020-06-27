@@ -6,8 +6,10 @@
   <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="w-full max-w-xs p-8">
-  <label for="apiKey" id="apiKey-label" class="block test-gray-700 text-sm font-bold mb-2">Todoist Personal API Key</label>
-  <input type="text" id="apiKey" name="apiKey" aria-labelledby="apiKey-lable" aria-describedby="apiKey-status" class="shadow appearance-none board rounded w-full py-2 px-3 text-grey-700 leading-tight mb-1" />
+  <label for="apiKey" id="apiKey-label" class="block test-gray-700 text-sm font-bold mb-2">
+    Todoist Personal API Key <button id="apiKey-toggle" aria-label="show API token" class="appearance-none text-blue-500 ml-2">Show</button>
+  </label>
+  <input type="password" id="apiKey" name="apiKey" aria-labelledby="apiKey-lable" aria-describedby="apiKey-status" class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-700 leading-tight mb-1" />
   <span id="apiKey-status" class="text-xs"></span>
   <script type="application/javascript" src="index.js"></script>
 </body>

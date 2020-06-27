@@ -2,6 +2,19 @@ const browser = require("webextension-polyfill");
 
 const apiKeyInput = document.querySelector("#apiKey");
 const apiKeyStatus = document.querySelector("#apiKey-status");
+const apiKeyToggle = document.querySelector("#apiKey-toggle");
+
+apiKeyToggle.addEventListener("click", () => {
+  if (apiKeyToggle.textContent === "Show") {
+    apiKeyToggle.textContent = "Hide";
+    apiKeyInput.setAttribute("type", "text");
+    apiKeyInput.setAttribute("aria-label", "hide API token");
+  } else {
+    apiKeyToggle.textContent = "Show";
+    apiKeyInput.setAttribute("type", "password");
+    apiKeyInput.setAttribute("aria-label", "show API token");
+  }
+});
 
 apiKeyInput.addEventListener("input", async ({ target }) => {
   await browser.storage.local.set({ apiKey: target.value });
