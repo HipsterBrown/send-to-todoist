@@ -5,7 +5,7 @@
   "main": " ",
   "scripts": {
     "build": "webpack",
-    "run": "web-ext run -f='/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin' --url='duckduckgo.com'",
+    "watch:ext": "web-ext run -f='/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin' --url='duckduckgo.com'",
     "sign": "web-ext sign --api-key=$SIGNING_KEY --api-secret=$SIGNING_SECRET --channel=listed"
   },
   "repository": {
