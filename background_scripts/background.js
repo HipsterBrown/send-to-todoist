@@ -40,7 +40,7 @@ function setOnboardingMenuAction() {
 }
 
 browser.runtime.onInstalled.addListener(async ({ reason }) => {
-  if (["install", "update"].includes(reason)) {
+  if (["install", "update", "browser_update"].includes(reason)) {
     const key = await getApiKey();
     if (key) {
       setProjectMenus();
