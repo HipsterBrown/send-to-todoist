@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Send to Todoist",
   "description": "Quickly create tasks in Todoist",
-  "version": "1.5",
+  "version": "1.5.1",
   "applications": {
     "gecko": {
       "id": "send-to-todoist@hipsterbrown.com"
