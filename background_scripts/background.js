@@ -7,23 +7,23 @@ async function setProjectMenus() {
 
   projects.forEach(({ id, name, color }, index) => {
     const parentId = browser.menus.create({
-      contexts: ["selection", "link"],
+      contexts: ["selection", "link", "page"],
       id: String(id),
       title: `&${index + 1} ${name}`,
       icons: {
-        "16": `icons/project-color-${color}.svg`
+        16: `icons/project-color-${color}.svg`
       }
     });
     DUE_STRINGS.forEach((dueString, dueIndex) => {
       browser.menus.create({
-        contexts: ["selection", "link"],
+        contexts: ["selection", "link", "page"],
         id: `${index}-due-${dueString}`,
         title: `&${dueIndex + 1} ${dueString}`,
         parentId
       });
     });
     browser.menus.create({
-      contexts: ["selection", "link"],
+      contexts: ["selection", "link", "page"],
       id: `${index}-due`,
       title: `&${DUE_STRINGS.length + 1} No due date`,
       parentId
@@ -70,7 +70,11 @@ browser.menus.onClicked.addListener(async event => {
   let content = event.selectionText || event.linkText;
 
   if (event.linkUrl) {
-    content += ` ${event.linkUrl}`;
+    content += ` | ${event.linkUrl}`;
+  }
+
+  if (!content && event.pageUrl) {
+    content = event.pageUrl;
   }
 
   if (content) {
@@ -99,6 +103,12 @@ browser.menus.onClicked.addListener(async event => {
         message: data.url
       });
     }
+  } else {
+    await browser.notifications.create("noTask", {
+      type: "basic",
+      title: `No content found`,
+      message: JSON.stringify(event)
+    });
   }
 });
 
