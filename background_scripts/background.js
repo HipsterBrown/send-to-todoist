@@ -74,7 +74,10 @@ browser.menus.onClicked.addListener(async event => {
   }
 
   if (!content && event.pageUrl) {
-    content = event.pageUrl;
+    const [title] = await browser.tabs.executeScript({
+      code: "document.title"
+    });
+    content = `[${title}](${event.pageUrl})`;
   }
 
   if (content) {
