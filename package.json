@@ -12,7 +12,9 @@
     "type": "git",
     "url": "git+https://github.com/hipsterbrown/send-to-todoist.git"
   },
-  "keywords": ["web-extension"],
+  "keywords": [
+    "web-extension"
+  ],
   "author": "Hipsterbrown",
   "license": "Apache-2.0",
   "bugs": {
