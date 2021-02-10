@@ -22,9 +22,8 @@
   },
   "homepage": "https://github.com/hipsterbrown/send-to-todoist#readme",
   "devDependencies": {
-    "@ianwalter/web-ext-webpack-plugin": "^0.1.0",
     "firefox-webext-types": "^1.0.0",
-    "web-ext": "^4.3.0",
+    "web-ext": "^5.5.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12"
   },

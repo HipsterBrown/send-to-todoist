@@ -1,5 +1,4 @@
 const path = require("path");
-const WebExtWebpackPlugin = require("@ianwalter/web-ext-webpack-plugin");
 
 module.exports = {
   devtool: "source-map",
@@ -13,9 +12,4 @@ module.exports = {
     path: path.resolve(__dirname, "build"),
     filename: "[name]/index.js"
   }
-  // plugins: [
-  //   new WebExtWebpackPlugin({
-  //     firefox: "firefoxdeveloperedition"
-  //   })
-  // ]
 };
