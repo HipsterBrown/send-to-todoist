@@ -1,5 +1,18 @@
 const browser = require("webextension-polyfill");
 
+async function getApiKey() {
+  const { apiKey } = await browser.storage.local.get("apiKey");
+  return apiKey;
+}
+
+async function getProjects() {
+  const key = await getApiKey();
+  const response = await fetch("https://api.todoist.com/rest/v1/projects", {
+    headers: { Authorization: `Bearer ${key}` }
+  });
+  return response.json();
+}
+
 const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
 
 async function setProjectMenus() {
@@ -70,7 +83,7 @@ browser.runtime.onMessage.addListener(async ({ status }) => {
   }
 });
 
-browser.menus.onClicked.addListener(async event => {
+async function saveTask(event) {
   if (event.menuItemId === "set-todoist-key") {
     return browser.browserAction.openPopup();
   }
@@ -122,7 +135,9 @@ browser.menus.onClicked.addListener(async event => {
       message: JSON.stringify(event)
     });
   }
-});
+}
+
+browser.menus.onClicked.addListener(saveTask);
 
 browser.notifications.onClicked.addListener(async id => {
   if (id === "newTask") {
@@ -131,15 +146,20 @@ browser.notifications.onClicked.addListener(async id => {
   }
 });
 
-async function getApiKey() {
-  const { apiKey } = await browser.storage.local.get("apiKey");
-  return apiKey;
-}
+browser.commands.onCommand.addListener(async command => {
+  if (command === "save-page") {
+    const key = await getApiKey();
+    if (!key) {
+      return browser.tabs.executeScript({
+        code: "alert('Please enter API key in extension popup')"
+      });
+    }
 
-async function getProjects() {
-  const key = await getApiKey();
-  const response = await fetch("https://api.todoist.com/rest/v1/projects", {
-    headers: { Authorization: `Bearer ${key}` }
-  });
-  return response.json();
-}
+    const projects = await getProjects();
+    const inbox = projects.find(project => project.inbox_project === true);
+    const [pageUrl] = await browser.tabs.executeScript({
+      code: "location.href"
+    });
+    saveTask({ pageUrl, menuItemId: "0-Inbox", parentMenuItemId: inbox.id });
+  }
+});

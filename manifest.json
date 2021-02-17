@@ -16,6 +16,14 @@
   "background": {
     "scripts": ["build/background/index.js"]
   },
+  "commands": {
+    "save-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+I"
+      },
+      "description": "Create an Inbox task for the current page"
+    }
+  },
   "icons": {
     "48": "icons/SendToTodoist.svg",
     "96": "icons/SendToTodoist.svg"
