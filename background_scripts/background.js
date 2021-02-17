@@ -1,4 +1,9 @@
 const browser = require("webextension-polyfill");
+const IS_CHROME = typeof browser.menus === "undefined";
+
+if (IS_CHROME) {
+  browser.menus = chrome.contextMenus;
+}
 
 async function getApiKey() {
   const { apiKey } = await browser.storage.local.get("apiKey");
@@ -19,13 +24,14 @@ async function setProjectMenus() {
   const projects = await getProjects();
 
   projects.forEach(({ id, name, color }, index) => {
+    const icons = IS_CHROME
+      ? null
+      : { icons: { 16: `icons/project-color-${color}.svg` } };
     const parentId = browser.menus.create({
       contexts: ["selection", "link", "page"],
       id: String(id),
       title: `&${index + 1} ${name}`,
-      icons: {
-        16: `icons/project-color-${color}.svg`
-      }
+      ...icons
     });
     DUE_STRINGS.forEach((dueString, dueIndex) => {
       browser.menus.create({
@@ -85,6 +91,7 @@ browser.runtime.onMessage.addListener(async ({ status }) => {
 
 async function saveTask(event) {
   if (event.menuItemId === "set-todoist-key") {
+    if (IS_CHROME) return;
     return browser.browserAction.openPopup();
   }
 
@@ -125,14 +132,16 @@ async function saveTask(event) {
       await browser.notifications.create("newTask", {
         type: "basic",
         title: `New ${projectName || "Inbox"} task created!`,
-        message: data.url
+        message: data.url,
+        iconUrl: "icons/SendToTodoist.svg"
       });
     }
   } else {
     await browser.notifications.create("noTask", {
       type: "basic",
       title: `No content found`,
-      message: JSON.stringify(event)
+      message: JSON.stringify(event),
+      iconUrl: "icons/SendToTodoist.svg"
     });
   }
 }
