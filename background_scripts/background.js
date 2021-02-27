@@ -23,31 +23,33 @@ const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
 async function setProjectMenus() {
   const projects = await getProjects();
 
-  projects.forEach(({ id, name, color }, index) => {
-    const icons = IS_CHROME
-      ? null
-      : { icons: { 16: `icons/project-color-${color}.svg` } };
-    const parentId = browser.menus.create({
-      contexts: ["selection", "link", "page"],
-      id: String(id),
-      title: `&${index + 1} ${name}`,
-      ...icons
-    });
-    DUE_STRINGS.forEach((dueString, dueIndex) => {
+  projects
+    .sort((a, b) => a.order - b.order)
+    .forEach(({ id, name, color }, index) => {
+      const icons = IS_CHROME
+        ? null
+        : { icons: { 16: `icons/project-color-${color}.svg` } };
+      const parentId = browser.menus.create({
+        contexts: ["selection", "link", "page"],
+        id: String(id),
+        title: `&${index + 1} ${name}`,
+        ...icons
+      });
+      DUE_STRINGS.forEach((dueString, dueIndex) => {
+        browser.menus.create({
+          contexts: ["selection", "link", "page"],
+          id: `${index}-due-${dueString}`,
+          title: `&${dueIndex + 1} ${dueString}`,
+          parentId
+        });
+      });
       browser.menus.create({
         contexts: ["selection", "link", "page"],
-        id: `${index}-due-${dueString}`,
-        title: `&${dueIndex + 1} ${dueString}`,
+        id: `${index}-due`,
+        title: `&${DUE_STRINGS.length + 1} No due date`,
         parentId
       });
     });
-    browser.menus.create({
-      contexts: ["selection", "link", "page"],
-      id: `${index}-due`,
-      title: `&${DUE_STRINGS.length + 1} No due date`,
-      parentId
-    });
-  });
 }
 
 function setOnboardingMenuAction() {
@@ -78,7 +80,7 @@ browser.runtime.onStartup.addListener(async () => {
   }
 });
 
-browser.runtime.onMessage.addListener(async ({ status }) => {
+browser.runtime.onMessage.addListener(async ({ status }, _sender, reply) => {
   if (status === "API_KEY_SET") {
     await browser.menus.remove("set-todoist-key");
     setProjectMenus();
@@ -86,6 +88,11 @@ browser.runtime.onMessage.addListener(async ({ status }) => {
   if (status === "API_KEY_REQUIRED") {
     await browser.menus.removeAll();
     setOnboardingMenuAction();
+  }
+  if (status === "SYNC_PROJECTS") {
+    await browser.menus.removeAll();
+    await setProjectMenus();
+    reply({ message: "SYNC_COMPLETE" });
   }
 });
 
