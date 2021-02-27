@@ -15,6 +15,11 @@ Operating system capable of running Node.js (at least version 10.17.0) and shoul
 1. Run `npm run build` to build JavaScript code using Webpack
 1. Run `npm run watch:ext` to run extension as a temporary addon in a new instance of Firefox Developer Edition
 
+## Screenshots
+
+![screenshot of custom context menu](./images/screenshot-1.png)
+![screenshot of extension popup](./images/screenshot-2.png)
+
 ## License
 
 [Apache-2.0](./LICENSE)
