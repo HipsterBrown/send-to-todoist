@@ -1,76 +1,39 @@
 const { browser } = require("webextension-polyfill-ts");
 
-const apiKeyInput = document.querySelector("#apiKey");
-const apiKeyStatus = document.querySelector("#apiKey-status");
-const apiKeyToggle = document.querySelector("#apiKey-toggle");
+const CHECK_ICON = "../../../icons/check.svg";
+const INFO_ICON = "../../../icons/info.svg";
+const SYNC_ICON = "../../../icons/sync.svg";
+
 const syncButton = document.querySelector("#sync");
+const syncMessage = document.querySelector("#sync-message");
+const syncIcon = document.querySelector("#sync-icon");
 
-apiKeyToggle.addEventListener("click", () => {
-  if (apiKeyToggle.textContent === "Show") {
-    apiKeyToggle.textContent = "Hide";
-    apiKeyInput.setAttribute("type", "text");
-    apiKeyInput.setAttribute("aria-label", "hide API token");
-  } else {
-    apiKeyToggle.textContent = "Show";
-    apiKeyInput.setAttribute("type", "password");
-    apiKeyInput.setAttribute("aria-label", "show API token");
-  }
-});
-
-apiKeyInput.addEventListener("input", async ({ target }) => {
-  await browser.storage.local.set({ apiKey: target.value });
-  apiKeyStatus.classList.remove("text-gray-700");
-  apiKeyStatus.classList.add("text-green-500");
-  apiKeyStatus.textContent = "API Key saved!";
-
-  if (target.value) {
-    browser.runtime.sendMessage({
-      status: "API_KEY_SET"
-    });
-    syncButton.removeAttribute("disabled");
-    syncButton.classList.remove("cursor-not-allowed");
-  } else {
-    browser.runtime.sendMessage({
-      status: "API_KEY_REQUIRED"
-    });
-    syncButton.setAttribute("disabled", true);
-    syncButton.classList.add("cursor-not-allowed");
-  }
-
-  setTimeout(() => {
-    apiKeyStatus.textContent = "";
-    apiKeyStatus.classList.remove("text-green-500");
-  }, 2000);
-});
-
-syncButton.addEventListener("click", async () => {
+syncMessage.addEventListener("click", async () => {
   const { apiKey } = await browser.storage.local.get("apiKey");
   if (apiKey) {
-    syncButton.textContent = "Syncing...";
+    syncIcon.classList.add("animate-spin");
+    syncMessage.textContent = "Syncing...";
     await browser.runtime.sendMessage({
       status: "SYNC_PROJECTS"
     });
-    syncButton.textContent = "Sync complete!";
+    syncIcon.classList.remove("animate-spin");
+    syncIcon.src = CHECK_ICON;
+    syncMessage.textContent = "Sync complete!";
 
     setTimeout(() => {
-      syncButton.textContent = "Sync latest settings";
+      syncIcon.src = SYNC_ICON;
+      syncMessage.textContent = "Sync";
     }, 2000);
+  } else {
+    browser.runtime.openOptionsPage();
   }
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
   const { apiKey } = await browser.storage.local.get("apiKey");
-  if (apiKey) {
-    apiKeyInput.setAttribute("value", apiKey);
-    syncButton.removeAttribute("disabled");
-    syncButton.classList.remove("cursor-not-allowed");
-  } else {
-    apiKeyInput.focus();
-    apiKeyStatus.classList.add("text-gray-700");
-    apiKeyStatus.textContent =
-      "Find your Personal API token under Todoist Settings > Integrations";
-
-    syncButton.setAttribute("disabled", true);
-    syncButton.classList.add("cursor-not-allowed");
+  if (!apiKey) {
+    document.body.style = "min-width: 200px";
+    syncIcon.src = INFO_ICON;
+    syncMessage.textContent = "Configure extension";
   }
 });

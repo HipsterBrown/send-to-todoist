@@ -6,7 +6,8 @@ module.exports = {
   mode: process.env.NODE_ENV || "development",
   entry: {
     background: "./background_scripts/background.js",
-    popup: "./popup/popup.js"
+    popup: "./popup/popup.js",
+    options: "./options/options.js"
   },
   output: {
     path: path.resolve(__dirname, "build"),

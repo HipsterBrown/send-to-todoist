@@ -114,8 +114,7 @@ browser.runtime.onMessage.addListener(async ({ status }, _sender, reply) => {
 
 async function saveTask(event) {
   if (event.menuItemId === "set-todoist-key") {
-    if (IS_CHROME) return;
-    return browser.browserAction.openPopup();
+    return browser.runtime.openOptionsPage();
   }
 
   const key = await getApiKey();
