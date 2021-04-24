@@ -17,7 +17,7 @@ Operating system capable of running Node.js (at least version 10.17.0) and shoul
 
 ## Screenshots
 
-![screenshot of custom context menu](./images/screenshot-1.png)
+![screenshot of custom context menu](./images/screenshot-menus.png)
 ![screenshot of extension popup](./images/screenshot-2.png)
 
 ## License
