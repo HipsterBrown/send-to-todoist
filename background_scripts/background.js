@@ -1,4 +1,4 @@
-const browser = require("webextension-polyfill");
+const { browser } = require("webextension-polyfill-ts");
 const IS_CHROME = typeof browser.menus === "undefined";
 
 if (IS_CHROME) {
@@ -22,6 +22,22 @@ const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
 
 async function setProjectMenus() {
   const projects = await getProjects();
+  const inbox = projects.find(project => project.inbox_project === true);
+  const contexts = ["selection", "link", "page"];
+
+  browser.menus.create({
+    contexts,
+    id: "0-Inbox",
+    title: "&Send to Inbox",
+    ...(IS_CHROME
+      ? null
+      : { icons: { 16: `icons/project-color-${inbox.color}.svg` } })
+  });
+  browser.menus.create({
+    contexts,
+    id: "inbox-separator",
+    type: "separator"
+  });
 
   projects
     .sort((a, b) => a.order - b.order)
@@ -30,21 +46,21 @@ async function setProjectMenus() {
         ? null
         : { icons: { 16: `icons/project-color-${color}.svg` } };
       const parentId = browser.menus.create({
-        contexts: ["selection", "link", "page"],
+        contexts,
         id: String(id),
         title: `&${index + 1} ${name}`,
         ...icons
       });
       DUE_STRINGS.forEach((dueString, dueIndex) => {
         browser.menus.create({
-          contexts: ["selection", "link", "page"],
+          contexts,
           id: `${index}-due-${dueString}`,
           title: `&${dueIndex + 1} ${dueString}`,
           parentId
         });
       });
       browser.menus.create({
-        contexts: ["selection", "link", "page"],
+        contexts,
         id: `${index}-due`,
         title: `&${DUE_STRINGS.length + 1} No due date`,
         parentId

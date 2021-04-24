@@ -1,4 +1,4 @@
-const browser = require("webextension-polyfill");
+const { browser } = require("webextension-polyfill-ts");
 
 const apiKeyInput = document.querySelector("#apiKey");
 const apiKeyStatus = document.querySelector("#apiKey-status");
