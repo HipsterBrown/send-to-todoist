@@ -106,12 +106,14 @@ browser.commands
   .then(commands => {
     shortcutFieldsSection.innerHTML = "";
 
+    shortcutFlashIcon.src = INFO_ICON;
     if (IS_CHROME) {
-      shortcutFlashIcon.src = INFO_ICON;
       shortcutFlashMessage.innerHTML = `Shortcuts can only be edited at <a class="text-blue-500" href="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a>`;
-      shortcutFlash.classList.replace("bg-green-300", "bg-gray-200");
-      shortcutFlash.classList.remove("hidden");
+    } else {
+      shortcutFlashMessage.innerHTML = `Shortcuts can only be edited at <pre class="inline max-w-max">about:addons</pre>, see <a class="text-blue-500"  href="https://bug1303384.bmoattachments.org/attachment.cgi?id=9051647" target="_blank">the following tutorial</a>`;
     }
+    shortcutFlash.classList.replace("bg-green-300", "bg-gray-200");
+    shortcutFlash.classList.remove("hidden");
 
     commands.forEach(command => {
       const field = shortcutFieldTemplate.content.cloneNode(true);
@@ -134,12 +136,14 @@ browser.commands
       input.id = command.name;
       input.setAttribute("aria-labelledby", label.id);
       input.value = command.shortcut;
+      input.disabled = true;
 
-      if (IS_CHROME) {
-        input.disabled = true;
-      } else {
-        input.addEventListener("change", updateCommand);
-      }
+      /**
+       * TODO: create custom element for editing keyboard shortcut
+       * - maintains state of input using FSM
+       * - validates allowed keys
+       * - outputs symbols for each key, based on OS
+       */
 
       shortcutFieldsSection.appendChild(field);
     });
