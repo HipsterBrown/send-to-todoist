@@ -1,17 +1,28 @@
 const { browser } = require("webextension-polyfill-ts");
 
+const IS_CHROME = typeof browser.menus === "undefined";
+
 const CHECK_ICON = "../../../icons/check.svg";
 const INFO_ICON = "../../../icons/info.svg";
 const SYNC_ICON = "../../../icons/sync.svg";
 
 const apiKeyInput = document.querySelector("#apiKey");
 const apiKeyToggle = document.querySelector("#apiKey-toggle");
+
 const syncButton = document.querySelector("#sync");
 const syncMessage = document.querySelector("#sync-message");
 const syncIcon = document.querySelector("#sync-icon");
+
 const messageBar = document.querySelector("#message-bar");
 const messageBarMessage = document.querySelector("#message-bar--message");
 const messageBarIcon = document.querySelector("#message-bar--icon");
+
+const shortcutFieldTemplate = document.querySelector("#shortcut-field");
+const shortcutFieldsSection = document.querySelector("#shortcut-fields");
+
+const shortcutFlash = document.querySelector("#shortcut-flash");
+const shortcutFlashMessage = document.querySelector("#shortcut-flash--message");
+const shortcutFlashIcon = document.querySelector("#shortcut-flash--icon");
 
 apiKeyToggle.addEventListener("click", () => {
   if (apiKeyToggle.textContent === "Show") {
@@ -30,7 +41,7 @@ apiKeyInput.addEventListener("input", async ({ target }) => {
   messageBarMessage.textContent = "API Key saved!";
   messageBarIcon.src = CHECK_ICON;
   messageBar.classList.remove("hidden", "bg-gray-200");
-  messageBar.classList.add("block", "bg-green-400");
+  messageBar.classList.add("block", "bg-green-300");
 
   if (target.value) {
     browser.runtime.sendMessage({
@@ -73,6 +84,68 @@ syncMessage.addEventListener("click", async () => {
   }
 });
 
+async function updateCommand({ target }) {
+  try {
+    await browser.commands.update({
+      name: target.name,
+      shortcut: target.value
+    });
+
+    shortcutFlash.classList.remove("hidden");
+
+    setTimeout(() => {
+      shortcutFlash.classList.add("hidden");
+    }, 2000);
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+browser.commands
+  .getAll()
+  .then(commands => {
+    shortcutFieldsSection.innerHTML = "";
+
+    if (IS_CHROME) {
+      shortcutFlashIcon.src = INFO_ICON;
+      shortcutFlashMessage.innerHTML = `Shortcuts can only be edited at <a class="text-blue-500" href="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a>`;
+      shortcutFlash.classList.replace("bg-green-300", "bg-gray-200");
+      shortcutFlash.classList.remove("hidden");
+    }
+
+    commands.forEach(command => {
+      const field = shortcutFieldTemplate.content.cloneNode(true);
+      const label = field.querySelector("label");
+      const input = field.querySelector("input");
+
+      label.htmlFor = command.name;
+      label.id = `${command.name}-label`;
+      label.textContent =
+        command.description ||
+        command.name
+          .split("_")
+          .filter(Boolean)
+          .map((word, index) =>
+            index ? word : word.slice(0, 1).toUpperCase() + word.slice(1)
+          )
+          .join(" ");
+
+      input.name = command.name;
+      input.id = command.name;
+      input.setAttribute("aria-labelledby", label.id);
+      input.value = command.shortcut;
+
+      if (IS_CHROME) {
+        input.disabled = true;
+      } else {
+        input.addEventListener("change", updateCommand);
+      }
+
+      shortcutFieldsSection.appendChild(field);
+    });
+  })
+  .catch(console.error);
+
 document.addEventListener("DOMContentLoaded", async () => {
   const { apiKey } = await browser.storage.local.get("apiKey");
   if (apiKey) {
@@ -84,7 +157,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     messageBarIcon.src = INFO_ICON;
     messageBarMessage.textContent =
       "Find your Personal API token under Todoist Settings > Integrations";
-    messageBar.classList.remove("hidden", "bg-green-400");
+    messageBar.classList.remove("hidden", "bg-green-300");
     messageBar.classList.add("block", "bg-gray-200");
 
     syncButton.setAttribute("disabled", true);

@@ -5,16 +5,14 @@
   "main": " ",
   "scripts": {
     "build": "webpack",
-    "watch:ext": "web-ext run -f='/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin' --url='duckduckgo.com'",
+    "watch:ext": "web-ext run -f='/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin' --url='todoist.com'",
     "sign": "web-ext sign --api-key=$SIGNING_KEY --api-secret=$SIGNING_SECRET --channel=listed"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hipsterbrown/send-to-todoist.git"
   },
-  "keywords": [
-    "web-extension"
-  ],
+  "keywords": ["web-extension"],
   "author": "Hipsterbrown",
   "license": "Apache-2.0",
   "bugs": {

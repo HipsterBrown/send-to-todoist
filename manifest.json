@@ -31,8 +31,7 @@
   "options_ui": {
     "page": "build/options/index.html",
     "open_in_tab": true,
-    "browser_style": true,
-    "chrome_style": true
+    "browser_style": true
   },
   "icons": {
     "48": "icons/SendToTodoist.svg",
