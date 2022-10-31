@@ -4,7 +4,7 @@
   "description": "A web extension for quickly creating tasks in todoist",
   "type": "module",
   "scripts": {
-    "build": "webpack",
+    "build": "web-ext build --overwrite-dest",
     "watch:ext": "web-ext run -f='/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin' --url='todoist.com'",
     "sign": "web-ext sign --api-key=$SIGNING_KEY --api-secret=$SIGNING_SECRET --channel=listed"
   },
@@ -24,10 +24,6 @@
   "devDependencies": {
     "firefox-webext-types": "^1.0.0",
     "web-ext": "^7.3.1",
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
-  },
-  "dependencies": {
     "webextension-polyfill-ts": "^0.26.0"
   }
 }
