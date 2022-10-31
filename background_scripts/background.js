@@ -1,5 +1,3 @@
-import { browser } from "webextension-polyfill-ts";
-
 const IS_CHROME = typeof browser.menus === "undefined";
 
 if (IS_CHROME) {
@@ -23,7 +21,6 @@ const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
 
 async function setProjectMenus() {
   const projects = await getProjects();
-  console.log({ projects })
   const inbox = projects.find(project => project.is_inbox_project === true);
   const contexts = ["selection", "link", "page"];
 

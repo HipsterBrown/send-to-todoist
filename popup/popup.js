@@ -1,5 +1,3 @@
-import { browser } from 'webextension-polyfill-ts';
-
 const CHECK_ICON = "../../../icons/check.svg";
 const INFO_ICON = "../../../icons/info.svg";
 const SYNC_ICON = "../../../icons/sync.svg";

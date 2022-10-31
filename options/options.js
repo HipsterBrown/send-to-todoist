@@ -1,5 +1,3 @@
-import { browser } from 'webextension-polyfill-ts';
-
 const IS_CHROME = typeof browser.menus === "undefined";
 
 const CHECK_ICON = "../../../icons/check.svg";
