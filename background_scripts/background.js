@@ -1,4 +1,5 @@
-const { browser } = require("webextension-polyfill-ts");
+import { browser } from "webextension-polyfill-ts";
+
 const IS_CHROME = typeof browser.menus === "undefined";
 
 if (IS_CHROME) {
@@ -12,7 +13,7 @@ async function getApiKey() {
 
 async function getProjects() {
   const key = await getApiKey();
-  const response = await fetch("https://api.todoist.com/rest/v1/projects", {
+  const response = await fetch("https://api.todoist.com/rest/v2/projects", {
     headers: { Authorization: `Bearer ${key}` }
   });
   return response.json();
@@ -22,7 +23,8 @@ const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
 
 async function setProjectMenus() {
   const projects = await getProjects();
-  const inbox = projects.find(project => project.inbox_project === true);
+  console.log({ projects })
+  const inbox = projects.find(project => project.is_inbox_project === true);
   const contexts = ["selection", "link", "page"];
 
   browser.menus.create({
@@ -137,7 +139,7 @@ async function saveTask(event) {
     const { id: projectId, name: projectName } =
       projects.find(({ id }) => id === parseInt(event.parentMenuItemId)) || {};
 
-    const response = await fetch("https://api.todoist.com/rest/v1/tasks", {
+    const response = await fetch("https://api.todoist.com/rest/v2/tasks", {
       method: "post",
       body: JSON.stringify({
         content,
@@ -187,7 +189,7 @@ browser.commands.onCommand.addListener(async command => {
     }
 
     const projects = await getProjects();
-    const inbox = projects.find(project => project.inbox_project === true);
+    const inbox = projects.find(project => project.is_inbox_project === true);
     const [pageUrl] = await browser.tabs.executeScript({
       code: "location.href"
     });

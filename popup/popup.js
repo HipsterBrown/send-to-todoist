@@ -1,4 +1,4 @@
-const { browser } = require("webextension-polyfill-ts");
+import { browser } from 'webextension-polyfill-ts';
 
 const CHECK_ICON = "../../../icons/check.svg";
 const INFO_ICON = "../../../icons/info.svg";

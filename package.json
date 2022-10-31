@@ -2,7 +2,7 @@
   "name": "send-to-todoist-ext",
   "version": "0.0.0-dev",
   "description": "A web extension for quickly creating tasks in todoist",
-  "main": " ",
+  "type": "module",
   "scripts": {
     "build": "webpack",
     "watch:ext": "web-ext run -f='/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin' --url='todoist.com'",
@@ -23,11 +23,11 @@
   "homepage": "https://github.com/hipsterbrown/send-to-todoist#readme",
   "devDependencies": {
     "firefox-webext-types": "^1.0.0",
-    "web-ext": "^5.5.0",
-    "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.12"
+    "web-ext": "^7.3.1",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
   },
   "dependencies": {
-    "webextension-polyfill-ts": "^0.25.0"
+    "webextension-polyfill-ts": "^0.26.0"
   }
 }

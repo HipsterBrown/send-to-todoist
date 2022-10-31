@@ -1,4 +1,4 @@
-const { browser } = require("webextension-polyfill-ts");
+import { browser } from 'webextension-polyfill-ts';
 
 const IS_CHROME = typeof browser.menus === "undefined";
 
@@ -70,6 +70,7 @@ syncMessage.addEventListener("click", async () => {
   if (apiKey) {
     syncIcon.classList.add("animate-spin");
     syncMessage.textContent = "Syncing...";
+
     await browser.runtime.sendMessage({
       status: "SYNC_PROJECTS"
     });
