@@ -1,7 +1,8 @@
+import './flash-message.js';
+
 const IS_CHROME = typeof browser.menus === "undefined";
 
 const CHECK_ICON = "../../../icons/check.svg";
-const INFO_ICON = "../../../icons/info.svg";
 const SYNC_ICON = "../../../icons/sync.svg";
 
 const apiKeyInput = document.querySelector("#apiKey");
@@ -12,15 +13,11 @@ const syncMessage = document.querySelector("#sync-message");
 const syncIcon = document.querySelector("#sync-icon");
 
 const messageBar = document.querySelector("#message-bar");
-const messageBarMessage = document.querySelector("#message-bar--message");
-const messageBarIcon = document.querySelector("#message-bar--icon");
 
 const shortcutFieldTemplate = document.querySelector("#shortcut-field");
 const shortcutFieldsSection = document.querySelector("#shortcut-fields");
 
 const shortcutFlash = document.querySelector("#shortcut-flash");
-const shortcutFlashMessage = document.querySelector("#shortcut-flash--message");
-const shortcutFlashIcon = document.querySelector("#shortcut-flash--icon");
 
 apiKeyToggle.addEventListener("click", () => {
   if (apiKeyToggle.textContent === "Show") {
@@ -36,10 +33,10 @@ apiKeyToggle.addEventListener("click", () => {
 
 apiKeyInput.addEventListener("input", async ({ target }) => {
   await browser.storage.local.set({ apiKey: target.value });
-  messageBarMessage.textContent = "API Key saved!";
-  messageBarIcon.src = CHECK_ICON;
-  messageBar.classList.remove("hidden", "bg-gray-200");
-  messageBar.classList.add("block", "bg-green-300");
+  messageBar
+    .setMessage("API Key saved!")
+    .setStatus("success")
+    .show();
 
   if (target.value) {
     browser.runtime.sendMessage({
@@ -58,8 +55,7 @@ apiKeyInput.addEventListener("input", async ({ target }) => {
   }
 
   setTimeout(() => {
-    messageBar.classList.remove("block");
-    messageBar.classList.add("hidden");
+    messageBar.hide();
   }, 2000);
 });
 
@@ -89,11 +85,10 @@ async function updateCommand({ target }) {
       name: target.name,
       shortcut: target.value
     });
-
-    shortcutFlash.classList.remove("hidden");
+    shortcutFlash.show();
 
     setTimeout(() => {
-      shortcutFlash.classList.add("hidden");
+      shortcutFlash.hide();
     }, 2000);
   } catch (error) {
     alert(error.message);
@@ -105,14 +100,12 @@ browser.commands
   .then(commands => {
     shortcutFieldsSection.innerHTML = "";
 
-    shortcutFlashIcon.src = INFO_ICON;
     if (IS_CHROME) {
-      shortcutFlashMessage.innerHTML = `Shortcuts can only be edited at <a class="text-blue-500" href="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a>`;
+      shortcutFlash.setMessage(`Shortcuts can only be edited at <a class="text-blue-500" href="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a>`)
     } else {
-      shortcutFlashMessage.innerHTML = `Shortcuts can only be edited at <pre class="inline max-w-max">about:addons</pre>, see <a class="text-blue-500"  href="https://bug1303384.bmoattachments.org/attachment.cgi?id=9051647" target="_blank">the following tutorial</a>`;
+      shortcutFlash.setMessage(`Shortcuts can only be edited at <pre class="inline max-w-max">about:addons</pre>, see <a class="text-blue-500"  href="https://bug1303384.bmoattachments.org/attachment.cgi?id=9051647" target="_blank">the following tutorial</a>`)
     }
-    shortcutFlash.classList.replace("bg-green-300", "bg-gray-200");
-    shortcutFlash.classList.remove("hidden");
+    shortcutFlash.setStatus("info").show();
 
     commands.forEach(command => {
       const field = shortcutFieldTemplate.content.cloneNode(true);
@@ -157,11 +150,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     syncButton.classList.remove("cursor-not-allowed");
   } else {
     apiKeyInput.focus();
-    messageBarIcon.src = INFO_ICON;
-    messageBarMessage.textContent =
-      "Find your Personal API token under Todoist Settings > Integrations";
-    messageBar.classList.remove("hidden", "bg-green-300");
-    messageBar.classList.add("block", "bg-gray-200");
+    messageBar
+      .setMessage("Find your Personal API token under Todoist Settings > Integrations")
+      .setStatus("info")
+      .show();
 
     syncButton.setAttribute("disabled", true);
     syncButton.classList.remove("bg-white", "hover:bg-gray-50");

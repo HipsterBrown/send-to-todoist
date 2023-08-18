@@ -22,10 +22,8 @@
             id="sync-icon" class="mr-1 inline"> <span id="sync-message">Sync</span></button>
       </div>
 
-      <div id="message-bar" class="bg-gray-200 p-2 flex items-center hidden mb-2">
-        <img src="../../../icons/check.svg" aria-hidden id="message-bar--icon" class="mr-2">
-        <span id="message-bar--message" class="text-xs text-gray-800"></span>
-      </div>
+      <flash-message id="message-bar" class="bg-gray-200 p-2 flex items-center hidden mb-2">
+      </flash-message>
 
       <div class="flex items-center justify-between mb-8">
         <label for="apiKey" id="apiKey-label" class="text-gray-700 text-sm font-normal">
@@ -41,10 +39,7 @@
       <h3 class="text-xl font-bold">Shortcuts</h2>
         <p class="text-sm text-gray-500 mb-4">Configure keyboard commands.</p>
 
-        <div id="shortcut-flash" class="bg-green-300 p-2 flex items-center hidden mb-2">
-          <img src="../../../icons/check.svg" aria-hidden id="shortcut-flash--icon" class="mr-2">
-          <span id="shortcut-flash--message" class="text-xs text-gray-800">Shortcut saved!</span>
-        </div>
+        <flash-message id="shortcut-flash" class="bg-green-300 p-2 flex items-center hidden mb-2"></flash-message>
 
         <div id="shortcut-fields">
           <p>Loading shortcuts...</p>
