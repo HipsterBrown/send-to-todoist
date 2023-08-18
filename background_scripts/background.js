@@ -134,7 +134,7 @@ async function saveTask(event) {
     const projects = await getProjects();
     const dueString = event.menuItemId.split("-").pop();
     const { id: projectId, name: projectName } =
-      projects.find(({ id }) => id === parseInt(event.parentMenuItemId)) || {};
+      projects.find(({ id }) => id === event.parentMenuItemId) || {};
 
     const response = await fetch("https://api.todoist.com/rest/v2/tasks", {
       method: "post",
