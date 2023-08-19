@@ -16,10 +16,14 @@
     <section class="w-1/2">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-3xl">Settings</h2>
-        <button id="sync"
-          class="max-w-max text-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          title="sync latest Todoist settings"><img src="../../../icons/sync.svg" aria-hidden role="presentation"
-            id="sync-icon" class="mr-1 inline"> <span id="sync-message">Sync</span></button>
+        <sync-it>
+          <button id="sync"
+            class="max-w-max text-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            title="sync latest Todoist settings">
+            <img src="../../../icons/sync.svg" aria-hidden role="presentation" id="sync-icon" class="mr-1 inline">
+            <span id="sync-message">Sync</span>
+          </button>
+        </sync-it>
       </div>
 
       <flash-message id="message-bar" class="bg-gray-200 p-2 flex items-center hidden mb-2">

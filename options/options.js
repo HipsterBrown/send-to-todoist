@@ -1,16 +1,12 @@
 import './flash-message.js';
+import './sync-it.js';
 
 const IS_CHROME = typeof browser.menus === "undefined";
-
-const CHECK_ICON = "../../../icons/check.svg";
-const SYNC_ICON = "../../../icons/sync.svg";
 
 const apiKeyInput = document.querySelector("#apiKey");
 const apiKeyToggle = document.querySelector("#apiKey-toggle");
 
-const syncButton = document.querySelector("#sync");
-const syncMessage = document.querySelector("#sync-message");
-const syncIcon = document.querySelector("#sync-icon");
+const syncButton = document.querySelector("sync-it");
 
 const messageBar = document.querySelector("#message-bar");
 
@@ -42,16 +38,12 @@ apiKeyInput.addEventListener("input", async ({ target }) => {
     browser.runtime.sendMessage({
       status: "API_KEY_SET"
     });
-    syncButton.removeAttribute("disabled");
-    syncButton.classList.remove("cursor-not-allowed", "bg-gray-300");
-    syncButton.classList.add("bg-white", "hover:bg-gray-50");
+    syncButton.enable()
   } else {
     browser.runtime.sendMessage({
       status: "API_KEY_REQUIRED"
     });
-    syncButton.setAttribute("disabled", true);
-    syncButton.classList.remove("bg-white", "hover:bg-gray-50");
-    syncButton.classList.add("cursor-not-allowed", "bg-gray-300");
+    syncButton.disable()
   }
 
   setTimeout(() => {
@@ -59,22 +51,18 @@ apiKeyInput.addEventListener("input", async ({ target }) => {
   }, 2000);
 });
 
-syncMessage.addEventListener("click", async () => {
+syncButton.addEventListener("click", async () => {
   const { apiKey } = await browser.storage.local.get("apiKey");
   if (apiKey) {
-    syncIcon.classList.add("animate-spin");
-    syncMessage.textContent = "Syncing...";
+    syncButton.setStatus("syncing")
 
     await browser.runtime.sendMessage({
       status: "SYNC_PROJECTS"
     });
-    syncIcon.classList.remove("animate-spin");
-    syncIcon.src = CHECK_ICON;
-    syncMessage.textContent = "Sync complete!";
+    syncButton.setStatus("complete")
 
     setTimeout(() => {
-      syncIcon.src = SYNC_ICON;
-      syncMessage.textContent = "Sync";
+      syncButton.setStatus("pending")
     }, 2000);
   }
 });
@@ -146,8 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const { apiKey } = await browser.storage.local.get("apiKey");
   if (apiKey) {
     apiKeyInput.setAttribute("value", apiKey);
-    syncButton.removeAttribute("disabled");
-    syncButton.classList.remove("cursor-not-allowed");
+    syncButton.enable();
   } else {
     apiKeyInput.focus();
     messageBar
@@ -155,8 +142,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       .setStatus("info")
       .show();
 
-    syncButton.setAttribute("disabled", true);
-    syncButton.classList.remove("bg-white", "hover:bg-gray-50");
-    syncButton.classList.add("cursor-not-allowed", "bg-gray-300");
+    syncButton.disable()
   }
 });
