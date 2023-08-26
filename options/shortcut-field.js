@@ -26,7 +26,7 @@ class ShortcutField extends HTMLElement {
     input.id = this.name
     input.setAttribute("aria-labelledby", label.id)
     input.value = this.shortcut
-    input.readonly = true
+    input.setAttribute("readonly", true)
 
     this.appendChild(content)
   }
