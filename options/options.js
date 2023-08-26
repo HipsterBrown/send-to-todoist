@@ -89,7 +89,9 @@ browser.commands
       shortcutFlash.setMessage(`Shortcuts can only be edited at <pre class="inline max-w-max">about:addons</pre>, see <a class="text-blue-500"  href="https://bug1303384.bmoattachments.org/attachment.cgi?id=9051647" target="_blank">the following tutorial</a>`)
     }
     shortcutFlash.setStatus("info").show();
-    shortcutFieldsSection.innerHTML = commands.map(command => `<shortcut-field name="${command.name}" description="${command.description}" shortcut="${command.shortcut}"></shortcut-field>`).join('')
+    shortcutFieldsSection.innerHTML = commands.map(command => (
+      `<shortcut-field name="${command.name}" description="${command.description}" shortcut="${command.shortcut}"></shortcut-field>`
+    )).join('')
   })
   .catch(console.error);
 
@@ -104,7 +106,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       .setMessage("Find your Personal API token under Todoist Settings > Integrations")
       .setStatus("info")
       .show();
-
     syncButton.disable()
   }
 });

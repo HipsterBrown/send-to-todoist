@@ -1,31 +1,24 @@
-const CHECK_ICON = "../../../icons/check.svg";
-const INFO_ICON = "../../../icons/info.svg";
-const SYNC_ICON = "../../../icons/sync.svg";
-const SETTINGS_ICON = "../../../icons/settings.svg";
+import '../options/sync-it.js'
 
-const syncButton = document.querySelector("#sync");
-const syncMessage = document.querySelector("#sync-message");
-const syncIcon = document.querySelector("#sync-icon");
+const INFO_ICON = "../../../icons/info.svg";
+
+const syncButton = document.querySelector("sync-it");
 
 const settingsButton = document.querySelector("#settings");
-const settingsMessage = document.querySelector("#settings-message");
-const settingsIcon = document.querySelector("#settings-icon");
+const settingsMessage = settingsButton.querySelector("#settings-message");
+const settingsIcon = settingsButton.querySelector("#settings-icon");
 
 syncButton.addEventListener("click", async () => {
   const { apiKey } = await browser.storage.local.get("apiKey");
   if (apiKey) {
-    syncIcon.classList.add("animate-spin");
-    syncMessage.textContent = "Syncing...";
+    syncButton.setStatus("syncing")
     await browser.runtime.sendMessage({
       status: "SYNC_PROJECTS"
     });
-    syncIcon.classList.remove("animate-spin");
-    syncIcon.src = CHECK_ICON;
-    syncMessage.textContent = "Sync complete!";
+    syncButton.setStatus("complete")
 
     setTimeout(() => {
-      syncIcon.src = SYNC_ICON;
-      syncMessage.textContent = "Sync";
+      syncButton.setStatus("pending")
     }, 2000);
   }
 });
