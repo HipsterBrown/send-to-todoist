@@ -1,5 +1,6 @@
 import './flash-message.js';
 import './sync-it.js';
+import './shortcut-field.js';
 
 const IS_CHROME = typeof browser.menus === "undefined";
 
@@ -7,12 +8,8 @@ const apiKeyInput = document.querySelector("#apiKey");
 const apiKeyToggle = document.querySelector("#apiKey-toggle");
 
 const syncButton = document.querySelector("sync-it");
-
 const messageBar = document.querySelector("#message-bar");
-
-const shortcutFieldTemplate = document.querySelector("#shortcut-field");
 const shortcutFieldsSection = document.querySelector("#shortcut-fields");
-
 const shortcutFlash = document.querySelector("#shortcut-flash");
 
 apiKeyToggle.addEventListener("click", () => {
@@ -86,47 +83,13 @@ async function updateCommand({ target }) {
 browser.commands
   .getAll()
   .then(commands => {
-    shortcutFieldsSection.innerHTML = "";
-
     if (IS_CHROME) {
       shortcutFlash.setMessage(`Shortcuts can only be edited at <a class="text-blue-500" href="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a>`)
     } else {
       shortcutFlash.setMessage(`Shortcuts can only be edited at <pre class="inline max-w-max">about:addons</pre>, see <a class="text-blue-500"  href="https://bug1303384.bmoattachments.org/attachment.cgi?id=9051647" target="_blank">the following tutorial</a>`)
     }
     shortcutFlash.setStatus("info").show();
-
-    commands.forEach(command => {
-      const field = shortcutFieldTemplate.content.cloneNode(true);
-      const label = field.querySelector("label");
-      const input = field.querySelector("input");
-
-      label.htmlFor = command.name;
-      label.id = `${command.name}-label`;
-      label.textContent =
-        command.description ||
-        command.name
-          .split("_")
-          .filter(Boolean)
-          .map((word, index) =>
-            index ? word : word.slice(0, 1).toUpperCase() + word.slice(1)
-          )
-          .join(" ");
-
-      input.name = command.name;
-      input.id = command.name;
-      input.setAttribute("aria-labelledby", label.id);
-      input.value = command.shortcut;
-      input.disabled = true;
-
-      /**
-       * TODO: create custom element for editing keyboard shortcut
-       * - maintains state of input using FSM
-       * - validates allowed keys
-       * - outputs symbols for each key, based on OS
-       */
-
-      shortcutFieldsSection.appendChild(field);
-    });
+    shortcutFieldsSection.innerHTML = commands.map(command => `<shortcut-field name="${command.name}" description="${command.description}" shortcut="${command.shortcut}"></shortcut-field>`).join('')
   })
   .catch(console.error);
 
