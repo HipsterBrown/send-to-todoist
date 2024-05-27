@@ -12,7 +12,7 @@ async function getApiKey() {
 async function getProjects() {
   const key = await getApiKey();
   const response = await fetch("https://api.todoist.com/rest/v2/projects", {
-    headers: { Authorization: `Bearer ${key}` }
+    headers: { Authorization: `Bearer ${key}` },
   });
   return response.json();
 }
@@ -20,9 +20,10 @@ async function getProjects() {
 const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
 
 async function setProjectMenus() {
+  const contexts = ["selection", "link", "page"];
   const projects = await getProjects();
   const inbox = projects.find(project => project.is_inbox_project === true);
-  const contexts = ["selection", "link", "page"];
+  inbox.order = -1;
 
   browser.menus.create({
     contexts,
