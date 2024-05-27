@@ -18,6 +18,7 @@ async function getProjects() {
 }
 
 const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
+const NO_DUE = "No due date";
 
 async function setProjectMenus() {
   const contexts = ["selection", "link", "page"];
@@ -54,15 +55,15 @@ async function setProjectMenus() {
       DUE_STRINGS.forEach((dueString, dueIndex) => {
         browser.menus.create({
           contexts,
-          id: `${index}-due-${dueString}`,
+          id: `${id}-${dueString}`,
           title: `&${dueIndex + 1} ${dueString}`,
           parentId
         });
       });
       browser.menus.create({
         contexts,
-        id: `${index}-due`,
-        title: `&${DUE_STRINGS.length + 1} No due date`,
+        id: `${id}-${NO_DUE}`,
+        title: `&${DUE_STRINGS.length + 1} ${NO_DUE}`,
         parentId
       });
     });
@@ -133,9 +134,10 @@ async function saveTask(event) {
 
   if (content) {
     const projects = await getProjects();
-    const dueString = event.menuItemId.split("-").pop();
-    const { id: projectId, name: projectName } =
-      projects.find(({ id }) => id === event.parentMenuItemId) || {};
+    const idParts = event.menuItemId.split("-");
+    const projectId = idParts[0];
+    const dueString = idParts[1];
+    const { name: projectName } = projects.find(({ id }) => id === projectId) || {};
 
     const response = await fetch("https://api.todoist.com/rest/v2/tasks", {
       method: "post",
@@ -191,6 +193,6 @@ browser.commands.onCommand.addListener(async command => {
     const [pageUrl] = await browser.tabs.executeScript({
       code: "location.href"
     });
-    saveTask({ pageUrl, menuItemId: "0-Inbox", parentMenuItemId: inbox.id });
+    saveTask({ pageUrl, menuItemId: `${inbox.id}-${NO_DUE}`, parentMenuItemId: inbox.id });
   }
 });
