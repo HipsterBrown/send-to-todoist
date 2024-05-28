@@ -30,8 +30,18 @@ const NO_DUE = "No due date";
 
 async function setProjectMenus() {
   const contexts = ["selection", "link", "page"];
+
   const projects = await getProjects();
   const sections = await getSections();
+
+  const projectSections = sections.reduce((result, section) => {
+    if (result[section.project_id]) {
+      result[section.project_id].push(section);
+    } else {
+      result[section.project_id] = [section];
+    }
+    return result;
+  }, {});
   const inbox = projects.find(project => project.is_inbox_project === true);
   inbox.order = -1;
 
@@ -61,6 +71,7 @@ async function setProjectMenus() {
         title: `&${index + 1} ${name}`,
         ...icons
       });
+
       DUE_STRINGS.forEach((dueString, dueIndex) => {
         browser.menus.create({
           contexts,
@@ -75,31 +86,40 @@ async function setProjectMenus() {
         title: `&${DUE_STRINGS.length + 1} ${NO_DUE}`,
         parentId
       });
-      sections
-        .filter(section => section.project_id === id)
-        .sort((a, b) => a.order - b.order)
-        .forEach(({ id: sectionId, name: sectionName }, sectionIndex) => {
-          const sectionParentId = browser.menus.create({
-              contexts,
-              id: `${id}--${sectionId}`,
-              title: `&${sectionName}`,
-              parentId
-          });
-          DUE_STRINGS.forEach((dueString, dueIndex) => {
+
+      if (projectSections[id]) {
+        browser.menus.create({
+          contexts,
+          id: `${id}-section-separator`,
+          type: "separator",
+          parentId
+        });
+
+        projectSections[id]
+          .sort((a, b) => a.order - b.order)
+          .forEach(({ id: sectionId, name: sectionName }, sectionIndex) => {
+            const sectionParentId = browser.menus.create({
+                contexts,
+                id: `${id}--${sectionId}`,
+                title: `&${sectionName}`,
+                parentId
+            });
+            DUE_STRINGS.forEach((dueString, dueIndex) => {
+              browser.menus.create({
+                contexts,
+                id: `${id}-${dueString}-${sectionId}`,
+                title: `&${dueIndex + 1} ${dueString}`,
+                parentId: sectionParentId
+              });
+            });
             browser.menus.create({
               contexts,
-              id: `${id}-${dueString}-${sectionId}`,
-              title: `&${dueIndex + 1} ${dueString}`,
+              id: `${id}-${NO_DUE}-${sectionId}`,
+              title: `&${DUE_STRINGS.length + 1} ${NO_DUE}`,
               parentId: sectionParentId
             });
           });
-          browser.menus.create({
-            contexts,
-            id: `${id}-${NO_DUE}-${sectionId}`,
-            title: `&${DUE_STRINGS.length + 1} ${NO_DUE}`,
-            parentId: sectionParentId
-          });
-        });
+      };
     });
 }
 
