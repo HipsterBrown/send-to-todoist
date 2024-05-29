@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "web-ext build --overwrite-dest",
-    "watch:ext": "web-ext run -f='/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin' --url='todoist.com'",
+    "watch:ext": "web-ext run -f=deved --url='todoist.com' --devtools --browser-console",
     "sign": "web-ext sign --api-key=$SIGNING_KEY --api-secret=$SIGNING_SECRET --channel=listed"
   },
   "repository": {
@@ -24,6 +24,6 @@
   "devDependencies": {
     "@types/webextension-polyfill": "^0.10.1",
     "firefox-webext-types": "^1.0.0",
-    "web-ext": "^7.6.2"
+    "web-ext": "^8.0.0"
   }
 }
