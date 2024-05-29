@@ -12,17 +12,38 @@ async function getApiKey() {
 async function getProjects() {
   const key = await getApiKey();
   const response = await fetch("https://api.todoist.com/rest/v2/projects", {
-    headers: { Authorization: `Bearer ${key}` }
+    headers: { Authorization: `Bearer ${key}` },
+  });
+  return response.json();
+}
+
+async function getSections() {
+  const key = await getApiKey();
+  const response = await fetch("https://api.todoist.com/rest/v2/sections", {
+    headers: { Authorization: `Bearer ${key}` },
   });
   return response.json();
 }
 
 const DUE_STRINGS = Object.freeze(["Today", "Tomorrow", "Next week"]);
+const NO_DUE = "No due date";
 
 async function setProjectMenus() {
-  const projects = await getProjects();
-  const inbox = projects.find(project => project.is_inbox_project === true);
   const contexts = ["selection", "link", "page"];
+
+  const projects = await getProjects();
+  const sections = await getSections();
+
+  const projectSections = sections.reduce((result, section) => {
+    if (result[section.project_id]) {
+      result[section.project_id].push(section);
+    } else {
+      result[section.project_id] = [section];
+    }
+    return result;
+  }, {});
+  const inbox = projects.find(project => project.is_inbox_project === true);
+  inbox.order = -1;
 
   browser.menus.create({
     contexts,
@@ -50,20 +71,55 @@ async function setProjectMenus() {
         title: `&${index + 1} ${name}`,
         ...icons
       });
+
       DUE_STRINGS.forEach((dueString, dueIndex) => {
         browser.menus.create({
           contexts,
-          id: `${index}-due-${dueString}`,
+          id: `${id}-${dueString}`,
           title: `&${dueIndex + 1} ${dueString}`,
           parentId
         });
       });
       browser.menus.create({
         contexts,
-        id: `${index}-due`,
-        title: `&${DUE_STRINGS.length + 1} No due date`,
+        id: `${id}-${NO_DUE}`,
+        title: `&${DUE_STRINGS.length + 1} ${NO_DUE}`,
         parentId
       });
+
+      if (projectSections[id]) {
+        browser.menus.create({
+          contexts,
+          id: `${id}-section-separator`,
+          type: "separator",
+          parentId
+        });
+
+        projectSections[id]
+          .sort((a, b) => a.order - b.order)
+          .forEach(({ id: sectionId, name: sectionName }, sectionIndex) => {
+            const sectionParentId = browser.menus.create({
+                contexts,
+                id: `${id}--${sectionId}`,
+                title: `&${sectionName}`,
+                parentId
+            });
+            DUE_STRINGS.forEach((dueString, dueIndex) => {
+              browser.menus.create({
+                contexts,
+                id: `${id}-${dueString}-${sectionId}`,
+                title: `&${dueIndex + 1} ${dueString}`,
+                parentId: sectionParentId
+              });
+            });
+            browser.menus.create({
+              contexts,
+              id: `${id}-${NO_DUE}-${sectionId}`,
+              title: `&${DUE_STRINGS.length + 1} ${NO_DUE}`,
+              parentId: sectionParentId
+            });
+          });
+      };
     });
 }
 
@@ -132,15 +188,15 @@ async function saveTask(event) {
 
   if (content) {
     const projects = await getProjects();
-    const dueString = event.menuItemId.split("-").pop();
-    const { id: projectId, name: projectName } =
-      projects.find(({ id }) => id === event.parentMenuItemId) || {};
+    const [projectId, dueString, sectionId] = event.menuItemId.split("-");
+    const { name: projectName } = projects.find(({ id }) => id === projectId) || {};
 
     const response = await fetch("https://api.todoist.com/rest/v2/tasks", {
       method: "post",
       body: JSON.stringify({
         content,
         project_id: projectId,
+        section_id: sectionId,
         due_string: DUE_STRINGS.includes(dueString) ? dueString : undefined
       }),
       headers: {
@@ -190,6 +246,6 @@ browser.commands.onCommand.addListener(async command => {
     const [pageUrl] = await browser.tabs.executeScript({
       code: "location.href"
     });
-    saveTask({ pageUrl, menuItemId: "0-Inbox", parentMenuItemId: inbox.id });
+    saveTask({ pageUrl, menuItemId: `${inbox.id}-${NO_DUE}`, parentMenuItemId: inbox.id });
   }
 });
