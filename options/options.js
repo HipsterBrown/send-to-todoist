@@ -6,6 +6,7 @@ const IS_CHROME = typeof browser.menus === "undefined";
 
 const apiKeyInput = document.querySelector("#apiKey");
 const apiKeyToggle = document.querySelector("#apiKey-toggle");
+const projectShortcutSelect = document.querySelector("#shortcutProject")
 
 const syncButton = document.querySelector("sync-it");
 const messageBar = document.querySelector("#message-bar");
@@ -56,6 +57,7 @@ syncButton.addEventListener("click", async () => {
     await browser.runtime.sendMessage({
       status: "SYNC_PROJECTS"
     });
+    await syncProjectsForShortcut(apiKey)
     syncButton.setStatus("complete")
 
     setTimeout(() => {
@@ -64,21 +66,43 @@ syncButton.addEventListener("click", async () => {
   }
 });
 
-async function updateCommand({ target }) {
-  try {
-    await browser.commands.update({
-      name: target.name,
-      shortcut: target.value
-    });
-    shortcutFlash.show();
-
-    setTimeout(() => {
-      shortcutFlash.hide();
-    }, 2000);
-  } catch (error) {
-    alert(error.message);
-  }
+async function getProjects(key) {
+  const response = await fetch("https://api.todoist.com/rest/v2/projects", {
+    headers: { Authorization: `Bearer ${key}` },
+  });
+  return response.json();
 }
+
+async function syncProjectsForShortcut(apiKey) {
+  const projects = await getProjects(apiKey);
+  const { shortcutProject } = await browser.storage.local.get("shortcutProject");
+  const projectOptions = projects.map(({ id, name }) => {
+    if (shortcutProject === id) {
+      return `<option value="${id}" selected>${name}</option>`
+    }
+    return `<option value="${id}">${name}</option>`
+  });
+  projectShortcutSelect.innerHTML = projectOptions.join('');
+
+}
+
+projectShortcutSelect.addEventListener("change", async ({ target }) => {
+  await browser.storage.local.set({ shortcutProject: target.value });
+  messageBar
+    .setMessage("Shortcut Project saved!")
+    .setStatus("success")
+    .show();
+
+  if (target.value) {
+    browser.runtime.sendMessage({
+      status: "PROJECT_SHORTCUT_SET"
+    });
+  }
+
+  setTimeout(() => {
+    messageBar.hide();
+  }, 2000);
+});
 
 browser.commands
   .getAll()
@@ -100,6 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (apiKey) {
     apiKeyInput.setAttribute("value", apiKey);
     syncButton.enable();
+    void syncProjectsForShortcut(apiKey)
   } else {
     apiKeyInput.focus();
     messageBar
@@ -107,5 +132,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       .setStatus("info")
       .show();
     syncButton.disable()
+    projectShortcutSelect.setAttribute('disabled')
   }
 });

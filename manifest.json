@@ -28,6 +28,12 @@
         "default": "Ctrl+Shift+I"
       },
       "description": "Create an Inbox task for the current page"
+    },
+    "save-page-to-project": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+1"
+      },
+      "description": "Create an task for the current page in a selected project"
     }
   },
   "options_ui": {

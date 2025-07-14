@@ -9,6 +9,11 @@ async function getApiKey() {
   return apiKey;
 }
 
+async function getShortcutProject() {
+  const { shortcutProject } = await browser.storage.local.get("shortcutProject");
+  return shortcutProject;
+}
+
 async function getProjects() {
   const key = await getApiKey();
   const response = await fetch("https://api.todoist.com/rest/v2/projects", {
@@ -99,10 +104,10 @@ async function setProjectMenus() {
           .sort((a, b) => a.order - b.order)
           .forEach(({ id: sectionId, name: sectionName }, sectionIndex) => {
             const sectionParentId = browser.menus.create({
-                contexts,
-                id: `${id}--${sectionId}`,
-                title: `&${sectionName}`,
-                parentId
+              contexts,
+              id: `${id}--${sectionId}`,
+              title: `&${sectionName}`,
+              parentId
             });
             DUE_STRINGS.forEach((dueString, dueIndex) => {
               browser.menus.create({
@@ -247,5 +252,14 @@ browser.commands.onCommand.addListener(async command => {
       code: "location.href"
     });
     saveTask({ pageUrl, menuItemId: `${inbox.id}-${NO_DUE}`, parentMenuItemId: inbox.id });
+  }
+  if (command === "save-page-to-project") {
+    const shortcutProject = await getShortcutProject()
+    const projects = await getProjects()
+    const project = projects.find(project => project.id === shortcutProject)
+    const [pageUrl] = await browser.tabs.executeScript({
+      code: "location.href"
+    });
+    saveTask({ pageUrl, menuItemId: `${project.id}-${NO_DUE}`, parentMenuItemId: project.id });
   }
 });
